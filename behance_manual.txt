@@ -1,0 +1,11 @@
+Get a user's information: 
+
+https://www.behance.net/v2/users/bulinda?api_key=unZ87h4Fn6lDckQOQbIB8NFZrOVIypYx
+
+Get a user's projects:
+
+http://www.behance.net/v2/users/bulinda/projects?api_key=unZ87h4Fn6lDckQOQbIB8NFZrOVIypYx
+
+Get the content of a project:
+
+http://www.behance.net/v2/projects/{project_id}?api_key=unZ87h4Fn6lDckQOQbIB8NFZrOVIypYx
