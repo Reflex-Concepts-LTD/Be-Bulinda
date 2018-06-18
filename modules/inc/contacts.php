@@ -4,8 +4,9 @@
             <div class="modal">
                 <div class="modal--information">
                     <p>Rentford Hse, 1st flr, Nairobi, KE</p>
-                    <a href="mailto:binary@be.co.ke">binary@be.co.ke</a>
-                    <a href="tel:+254789946578">+254 789 946578</a>
+                    <a href="mailto:binary@be.co.ke">binary@be.co.ke</a>                    
+		    <a href="tel:+254747246279">+254 747 BINARY</a>
+		    <a href="tel:+254789946578">+254 789 946578</a>
                 </div>
                 <ul class="modal--options">
                     <li><a target="_blank" href="http://be.net/bulinda">Bēhance</a></li>

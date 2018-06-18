@@ -2,9 +2,9 @@
 
 $configs = parse_ini_file(WPATH . "core/configs.ini");
 
-use PHPMailer\PHPMailer\PHPMailer;
-
 require 'modules/mailing/vendor/autoload.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
 
 class Form_Process extends Database {
 
@@ -12,62 +12,66 @@ class Form_Process extends Database {
         if ($_POST['action'] == "quote") {
             return $this->addQuote();
         } if ($_POST['action'] == "inquiry") {
-            return $this->addMessage();
+            return $this->testMessage();
         } if ($_POST['action'] == "subscription") {
             return $this->addSubscriber();
         }
     }
 
-    public function addSubscriber() {
-        $email = $_POST['email'];
-        $d_time = date("Y-m-d H:i:s");
+    public function testMessage() {
 
-        $sql = "INSERT INTO subscriptions(email, d_time) "
-                . "VALUES(:email, :d_time)";
-        $stmt = $this->prepareQuery($sql);
-        $stmt->bindValue("email", $email);
-        $stmt->bindValue("d_time", $d_time);
-        if ($stmt->execute()) {
-            $mail = new PHPMailer;                             // Passing `true` enables exceptions
-            $mail->isSendmail();
-            //Recipients
-            $mail->setFrom($_SESSION["MUsername"], $_SESSION["MUsernameFrom"]);
-            $mail->addAddress($email, $name);     // Add a recipient
-            $mail->addBCC($_SESSION["MUsername"], $_SESSION["MUsernameFrom"]);
-            //Content
-            $mail->Subject = 'SUBSCRIPTION CONFIRMATION';
-            $mail->isHTML(true);                                 // Set email format to HTML
-            $mail->Body = '<b>Email:</b> ' . $email . '<br/>'
-                    . '<b>Time:</b> ' . $d_time . '<br/>'
-                    . 'Thank you for signing up to our newsletter. We shall keep you posted on customised offers and promotions.<br/><br/><br/>'
-                    . 'Emails powered by <a href="https://reflexconcepts.co.ke" title="Reflex Concepts [KE, UG] LTD | Difference, Delivery, Reliability">Reflex Concepts [KE, UG] LTD</a> ';
+        //Server settings
+        $mail = new PHPMailer(true);
+        $mail->SMTPDebug = 2;                                 // Enable verbose debug output
+        $mail->isSMTP();                                      // Set mailer to use SMTP
+        $mail->Host = 'smtp.zoho.com; smtp.be.co.ke';  // Specify main and backup SMTP servers
+        $mail->SMTPAuth = true;                               // Enable SMTP authentication
+        $mail->Username = 'binary@be.co.ke';                 // SMTP username
+        $mail->Password = 'damaris1608';                           // SMTP password
+        $mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
+        $mail->Port = 465;                                    // TCP port to connect to
+        //Recipients
+        $mail->setFrom('binary@be.co.ke', 'Mailer');
+        $mail->addAddress('bellarmine16@gmail.com', 'Joe Trying');     // Add a recipient
+        //
+        //Content
+        $mail->isHTML(true);                                  // Set email format to HTML
+        $mail->Subject = 'Here is the subject';
+        $mail->Body = 'This is the HTML message body <b>in bold!</b>';
+        $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
-            $mail->AltBody = 'Your email is loading.';
-
-            if (!$mail->send()) {
-                echo '<div class="error-box">
-                      <div class="alert alert-warning">Error, please retry. Your inquiry has not been sent!</div>
-                      </div>';
-            } else {
-                echo '<div class="success-box">
-                      <div class="alert alert-success">Congratulations. Your inquiry has been sent successfully!</div>
-                      </div>';
-            }
-            return true;
+        $mail->send();
+        if (!$mail->send()) {
+            echo "<script>
+                iziToast.error({
+                    title: 'Oops!',
+                    theme: 'dark',
+                    message: 'Error, please retry. Not been sent!',
+                    position: 'topRight',
+                    overlay: 'true',
+                    timeout: 10000
+                });
+            </script>";
         } else {
-            return false;
+            echo "<script>
+                iziToast.success({
+                    title: 'Perfect!',
+                    theme: 'dark',
+                    message: 'Inquiry sent!',
+                    position: 'topRight',
+                    overlay: 'true',
+                    timeout: 10000
+                });
+            </script>";
         }
     }
 
-    public function addMessage() {
+    public function addMessage1() {
         $name = strtoupper($_POST['name']);
         //$phone = "+254" . substr($_POST['phone'], -9);
         $email = $_POST['email'];
-
         $message = implode(', ', $_POST['message']);
-
         $d_time = date("Y-m-d H:i:s");
-
         $sql = "INSERT INTO inquiries(name, email, message, d_time) "
                 . "VALUES(:name, :email, :message, :d_time)";
         $stmt = $this->prepareQuery($sql);
@@ -77,8 +81,60 @@ class Form_Process extends Database {
         $stmt->bindValue("message", $message);
         $stmt->bindValue("d_time", $d_time);
         if ($stmt->execute()) {
-            $mail = new PHPMailer;                             // Passing `true` enables exceptions
-            $mail->isSendmail();
+            $mail = new PHPMailer(true);
+            $mail->isSMTP();                                      // Set mailer to use SMTP
+            $mail->Host = $_SESSION["mail_host"];                   // Specify main and backup SMTP servers
+            $mail->SMTPAuth = true;                               // Enable SMTP authentication
+            $mail->Username = $_SESSION["MUsername"];                 // SMTP username
+            $mail->Password = $_SESSION["MPassword"];                           // SMTP password
+            $mail->SMTPSecure = $_SESSION["SMTPSecure"];                            // Enable TLS encryption, `ssl` also accepted
+            $mail->Port = $_SESSION["Port"];
+            //Recipients
+            $mail->setFrom($_SESSION["MUsername"], $_SESSION["MUsernameFrom"]);
+            $mail->addAddress($email, $name);     // Add a recipient
+            $mail->Subject = 'Receipt Confirmation';
+            $mail->isHTML(true);                                 // Set email format to HTML
+            $information = array($name, $email, $message, $d_time);
+            $replace_information = array('%name%', '%email%', '%message%', '%d_time%');
+
+            $content = str_replace($replace_information, $information, file_get_contents('modules/mailing/mail_template.html'));
+            $mail->msgHTML($content, dirname(__FILE__));
+            $mail->AltBody = 'Your email is loading.';
+            if (!$mail->send()) {
+            echo "Done";
+        } else {
+            echo "Done Not";
+        }
+            return $this->addMessageAdmin();
+        } else {
+            return false;
+        }
+    }
+
+    public function addMessageClone() {
+        $name = strtoupper($_POST['name']);
+        //$phone = "+254" . substr($_POST['phone'], -9);
+        $email = $_POST['email'];
+        $message = implode(', ', $_POST['message']);
+        $d_time = date("Y-m-d H:i:s");
+        $sql = "INSERT INTO inquiries(name, email, message, d_time) "
+                . "VALUES(:name, :email, :message, :d_time)";
+        $stmt = $this->prepareQuery($sql);
+        $stmt->bindValue("name", $name);
+        //$stmt->bindValue("phone", $phone);
+        $stmt->bindValue("email", $email);
+        $stmt->bindValue("message", $message);
+        $stmt->bindValue("d_time", $d_time);
+        if ($stmt->execute()) {
+            //Server settings
+            $mail = new PHPMailer(true);
+            $mail->isSMTP();                                      // Set mailer to use SMTP
+            $mail->Host = $_SESSION["mail_host"];  // Specify main and backup SMTP servers
+            $mail->SMTPAuth = true;                               // Enable SMTP authentication
+            $mail->Username = $_SESSION["MUsername"];                 // SMTP username
+            $mail->Password = $_SESSION["MPassword"];                           // SMTP password
+            $mail->SMTPSecure = $_SESSION["SMTPSecure"];                            // Enable TLS encryption, `ssl` also accepted
+            $mail->Port = $_SESSION["Port"];
             //Recipients
             $mail->setFrom($_SESSION["MUsername"], $_SESSION["MUsernameFrom"]);
             $mail->addAddress($email, $name);     // Add a recipient
@@ -90,21 +146,64 @@ class Form_Process extends Database {
                     . '<b>Contacts:</b> <br/>' . $email . '<br/>'
                     . '<b>Time:</b> <br/>' . $d_time . '<br/>'
                     . '<b>Request Services:</b> <br/>' . $message . '<br/><br/>'
-                    .'I will get back to you soonest possible. Thank you for considering my services.'
-                    .'<br/><br/><br/>'
+                    . '<br/><br/><br/>'
                     . 'Emails powered by <a href="https://reflexconcepts.co.ke" title="Reflex Concepts [KE, UG] LTD | Difference, Delivery, Reliability">Reflex Concepts [KE, UG] LTD</a> ';
-
             $mail->AltBody = 'Your email is loading.';
 
             if (!$mail->send()) {
                 echo '<div class="error-box">
-                      <div class="alert alert-warning">'.$_SESSION["Null_Feedback"].'</div>
+                      <div class="alert alert-warning">' . $_SESSION["Null_Feedback"] . '</div>
                       </div>';
             } else {
                 echo '<div class="success-box">
-                      <div class="alert alert-success">'.$_SESSION["Feedback"].'</div>
+                      <div class="alert alert-success">' . $_SESSION["Feedback"] . '</div>
                       </div>';
             }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function addMessageAdmin() {
+        $name = strtoupper($_POST['name']);
+        //$phone = "+254" . substr($_POST['phone'], -9);
+        $email = $_POST['email'];
+        $message = implode(', ', $_POST['message']);
+        $d_time = date("Y-m-d H:i:s");
+        $sql = "INSERT INTO inquiries(name, email, message, d_time) "
+                . "VALUES(:name, :email, :message, :d_time)";
+        $stmt = $this->prepareQuery($sql);
+        $stmt->bindValue("name", $name);
+        //$stmt->bindValue("phone", $phone);
+        $stmt->bindValue("email", $email);
+        $stmt->bindValue("message", $message);
+        $stmt->bindValue("d_time", $d_time);
+        if ($stmt->execute()) {
+            $mail = new PHPMailer(true);
+            $mail->isSMTP();                                      // Set mailer to use SMTP
+            $mail->Host = $_SESSION["mail_host"];  // Specify main and backup SMTP servers
+            $mail->SMTPAuth = true;                               // Enable SMTP authentication
+            $mail->Username = $_SESSION["MUsername"];                 // SMTP username
+            $mail->Password = $_SESSION["MPassword"];                           // SMTP password
+            $mail->SMTPSecure = $_SESSION["SMTPSecure"];                            // Enable TLS encryption, `ssl` also accepted
+            $mail->Port = $_SESSION["Port"];
+            //Recipients
+            $mail->setFrom($_SESSION["MUsername"], $_SESSION["MUsernameFrom"]);
+            $mail->addAddress($_SESSION["MUsername"], $_SESSION["MUsernameFrom"]);     // Add a recipient
+            //$mail->addBCC($_SESSION["MUsername"], $_SESSION["MUsernameFrom"]);
+            //Content
+            $mail->Subject = 'Service Request from Be Bulinda INC';
+            $mail->isHTML(true);                                 // Set email format to HTML
+            $mail->Body = '<b>Name:</b> <br/>' . $name . '<br/>'
+                    . '<b>Contacts:</b> <br/>' . $email . '<br/>'
+                    . '<b>Time:</b> <br/>' . $d_time . '<br/>'
+                    . '<b>Request Services:</b> <br/>' . $message . '<br/><br/>'
+                    . '<br/><br/><br/>'
+                    . 'Emails powered by <a href="https://reflexconcepts.co.ke" title="Reflex Concepts [KE, UG] LTD | Difference, Delivery, Reliability">Reflex Concepts [KE, UG] LTD</a> ';
+            $mail->AltBody = 'Your email is loading.';
+
+            $mail->send();
             return true;
         } else {
             return false;
@@ -156,11 +255,11 @@ class Form_Process extends Database {
 
             if (!$mail->send()) {
                 echo '<div class="error-box">
-                      <div class="alert alert-warning">'.$_SESSION["Null_Feedback"].'</div>
+                      <div class="alert alert-warning">' . $_SESSION["Null_Feedback"] . '</div>
                       </div>';
             } else {
                 echo '<div class="success-box">
-                      <div class="alert alert-success">'.$_SESSION["Feedback"].'</div>
+                      <div class="alert alert-success">' . $_SESSION["Feedback"] . '</div>
                       </div>';
             }
             return true;

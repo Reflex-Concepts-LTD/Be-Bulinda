@@ -75,11 +75,11 @@ $sub = new Form_Process;
             </div>
             <div class="work-request--information">
                 <div class="information-name">
-                    <input id="name" name="name" type="text" spellcheck="false">
+                    <input id="name" name="name" type="text" spellcheck="false" required="yes">
                     <label for="name">Name</label>
                 </div>
                 <div class="information-email">
-                    <input id="email" name="email" type="email" spellcheck="false">
+                    <input id="email" name="email" type="email" spellcheck="false" required="yes">
                     <label for="email">Email</label>
                 </div>
             </div>

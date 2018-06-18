@@ -7,6 +7,7 @@ $_SESSION["mail_host"] = $configs["mail_host"];
 $_SESSION["MUsername"] = $configs["MUsername"];
 $_SESSION["MPassword"] = $configs["MPassword"];
 $_SESSION["SMTPSecure"] = $configs["SMTPSecure"];
+$_SESSION["SMTPAuth"] = $configs["SMTPAuth"];
 $_SESSION["Port"] = $configs["Port"];
 $_SESSION["MUsernameFrom"] = $configs["MUsernameFrom"];
 $_SESSION["Feedback"] = $configs["Feedback"];
@@ -26,6 +27,8 @@ $_SESSION["Null_Feedback"] = $configs["Null_Feedback"];
         <meta name="keywords" content="be bulinda">
         <meta name="author" content="Be Bulinda">
         <link rel="stylesheet" href="web/css/main.css">
+        <link rel="stylesheet" href="web/izitoast/node_modules/izitoast/dist/css/iziToast.min.css">
+        <script src="web/izitoast/node_modules/izitoast/dist/js/iziToast.min.js" type="text/javascript"></script>
 
         <!--Listing FILTER END-->
         <?php
