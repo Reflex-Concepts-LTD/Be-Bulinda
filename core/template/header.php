@@ -1,6 +1,6 @@
 <div class="device-notification">
   <a class="device-notification--logo" href="#0">
-      <img src="web/img/BeBulinda[Credits].svg" width="200" alt="Be Bulinda">
+      <img src="web/img/bebulinda.svg" width="200" alt="Be Bulinda">
   </a>
   <p class="device-notification--message">Think Binary. Think Design. Think Code.</p>
 </div>
@@ -12,7 +12,7 @@
       <div class="l-wrapper">
         <header class="header">
           <a class="header--logo" href="#0">
-              <img src="web/img/BeBulinda[Credits].svg" width="200" alt="Be Bulinda">
+              <img src="web/img/bebulinda.svg" width="200" alt="Be Bulinda">
           </a>
           <button class="header--cta cta">Hire Me</button>
           <div class="header--nav-toggle">
